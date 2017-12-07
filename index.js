@@ -8,6 +8,7 @@ const chalk = require('chalk')
 const ComponentIndex = require('./components/component-index')
 const PureComponent = require('./components/pure-component')
 const StyleSheet = require('./components/stylesheet')
+const StyledComponents = require('./components/styled-components')
 const ShallowRender = require('./components/shallow-render')
 const FunctionComponent = require('./components/function-component')
 
@@ -23,8 +24,8 @@ const program = require('commander')
   .action(name => componentName = name)
   .option('-f, --fn', 'Create Function Component')
   .option('-r, --redux', 'Create Redux Store')
-  .option('-c, --css', `Add ${componentName}.css`)
   .option('-d, --directory <directory>', 'Use directory')
+  .option('-c, --css [css]', 'Add styling')
   .parse(process.argv)
 
 createComponent(componentName)
@@ -46,14 +47,22 @@ function createComponent (name) {
 }
 
 function ComponentGen (name, rootDirectory, hasCSS, makeFn) {
-  if (hasCSS) {
-    StyleSheet(rootDirectory)
+
+  let toImport = [];
+
+  switch (hasCSS) {
+    case 'styled-components':
+      toImport = toImport.concat(StyledComponents(rootDirectory, name).toImport)
+      break
+    case true:
+      toImport = toImport.concat(StyleSheet(rootDirectory).toImport)
+      break
   }
 
   if (makeFn) {
-    FunctionComponent(rootDirectory, name, hasCSS)
+    FunctionComponent(rootDirectory, name, toImport)
   } else {
-    PureComponent(rootDirectory, name, hasCSS)
+    PureComponent(rootDirectory, name, toImport)
   }
 
   ComponentIndex(rootDirectory, name)

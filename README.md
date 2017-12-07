@@ -132,6 +132,9 @@ export default users
 ```
 # Define directory with components
 $ add-react-component -d src Example
+
+# Creates component with styled-components as styling solution
+$ add-react-component -c styled-components Example
 ```
 
 
